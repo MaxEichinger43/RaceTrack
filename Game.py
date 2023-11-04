@@ -1,6 +1,5 @@
 import sys
 import math
-from numpy import arctan
 import pygame
 pygame.init()
 
@@ -26,17 +25,30 @@ white = (255, 255, 255)
 racer1 = pygame.Rect(screen_width // 2, screen_height // 2, racer1_gfx.get_width(), racer1_gfx.get_height())
 racer2 = pygame.Rect(screen_width // 2, screen_height // 2, racer2_gfx.get_width(), racer2_gfx.get_height())
 
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def get_rotation(self):
+        if self.y == 0:
+            if self.x > 0:
+                return 90
+            elif self.x < 0:
+                return -90
+            else:
+                return 0
+        else:
+            angle = math.degrees(math.atan(self.x / self.y))
+            if self.y < 0:
+                angle += 180
+            return angle
+
 #Racerspeed
 def_speed = 0
+racer1_speed = Vector(def_speed, def_speed)
+racer2_speed = Vector(def_speed, def_speed)
 
-racer1_speed_y = def_speed
-racer1_speed_x = def_speed
-
-racer2_speed_y = def_speed
-racer2_speed_x = def_speed
-
-rotRacer1 = arctan(racer1_speed_x / racer1_speed_y)
-rotRacer2 = arctan(racer2_speed_x / racer2_speed_y)
 
 #Creating clock
 clock = pygame.time.Clock()
@@ -51,48 +63,47 @@ while True:
     time = clock.tick(120) / 1000.0
 
 
-#Input system...........................
+    #Calculate the rotation of the racers based on the x and y components  
+    rotRacer1 = racer1_speed.get_rotation()
+    rotRacer2 = racer2_speed.get_rotation()
+
+
+    # Input system
     keys = pygame.key.get_pressed()
 
-#Racer1
+    # Racer1
     if keys[pygame.K_w]:
-        racer1_speed_y -= 10
-        racer1_speed_x -= racer1_speed_x * 0.01
+        racer1_speed.y -= 10
+        racer1_speed.x -= racer1_speed.x * 0.01
     if keys[pygame.K_a]:
-        racer1_speed_x -= 10
-        racer1_speed_y -= racer1_speed_y * 0.01
+        racer1_speed.x -= 10
+        racer1_speed.y -= racer1_speed.y * 0.01
     if keys[pygame.K_s]:
-        racer1_speed_y += 10
-        racer1_speed_x -= racer1_speed_x * 0.01
+        racer1_speed.y += 10
+        racer1_speed.x -= racer1_speed.x * 0.01
     if keys[pygame.K_d]:
-        racer1_speed_x += 10
-        racer1_speed_y -= racer1_speed_y * 0.01
+        racer1_speed.x += 10
+        racer1_speed.y -= racer1_speed.y * 0.01
 
-#Racer2
+    # Racer2
     if keys[pygame.K_UP]:
-        racer2_speed_y -= 10
+        racer2_speed.y -= 10
     if keys[pygame.K_LEFT]:
-        racer2_speed_x -= 10
+        racer2_speed.x -= 10
     if keys[pygame.K_DOWN]:
-        racer2_speed_y += 10
+        racer2_speed.y += 10
     if keys[pygame.K_RIGHT]:
-        racer2_speed_x += 10
+        racer2_speed.x += 10
 
+    # ...
 
-    racer1.y += racer1_speed_y * time
-    racer1.x += racer1_speed_x * time
-    racet1_dir = math.degrees(math.atan2(racer1_speed_y, racer1_speed_x)) + 90
+    racer1.y += racer1_speed.y * time
+    racer1.x += racer1_speed.x * time
 
+    # ...
 
-    racer2.y += racer2_speed_y * time
-    racer2.x += racer2_speed_x * time
-    
-    #Make sure the racers dont drive to ikea while racing
-    racer1.y = min(max(racer1.y, screen_height // 2 - 500), screen_height // 2 + 500)
-    racer1.x = min(max(racer1.x, screen_width // 2 - 500), screen_width // 2 + 500)
-
-    racer2.y = min(max(racer2.y, screen_height // 2 - 500), screen_height // 2 + 500)
-    racer2.x = min(max(racer2.x, screen_width // 2 - 500), screen_width // 2 + 500)
+    racer2.y += racer2_speed.y * time
+    racer2.x += racer2_speed.x * time
     #.........................................
 
 
@@ -104,9 +115,10 @@ while True:
 
 
 # Blit the racers on the racer surface based on their center points
-    racer1_gfx_rotated = pygame.transform.rotate(racer1_gfx, racet1_dir)
+    racer1_gfx_rotated = pygame.transform.rotate(racer1_gfx, rotRacer1)
+    racer2_gfx_rotated = pygame.transform.rotate(racer2_gfx, rotRacer2)
     Racer_surface.blit(racer1_gfx_rotated, racer1.center)
-    Racer_surface.blit(racer2_gfx, racer2.center)
+    Racer_surface.blit(racer2_gfx_rotated, racer2.center)
 
 
     # Blit the Track_surface and Racer_surface onto the screen
