@@ -3,28 +3,7 @@ import math
 import pygame
 pygame.init()
 
-#Preparing screen
-screen_width = 1680
-screen_height = 1050
-screen = pygame.display.set_mode((screen_width,screen_height))
-pygame.display.set_caption("RaceTrack")
-
-#Creating surfaces
-Track_surface = pygame.Surface((screen_width,screen_height))
-Racer_surface = pygame.Surface((screen_width,screen_height), pygame.SRCALPHA)
-
-#Track Graphics loading
-track = pygame.image.load("Tracks/Track01.png")
-
-#Racers Graphics loading
-racer1_gfx = pygame.image.load("Racers/racer01.png")
-racer2_gfx = pygame.image.load("Racers/racer01.png")
-white = (255, 255, 255)
-
-#Creating racers as objects
-racer1 = pygame.Rect(screen_width // 2, screen_height // 2, racer1_gfx.get_width(), racer1_gfx.get_height())
-racer2 = pygame.Rect(screen_width // 2, screen_height // 2, racer2_gfx.get_width(), racer2_gfx.get_height())
-
+#Defining Vektor
 class Vector:
     def __init__(self, x, y):
         self.x = x
@@ -44,10 +23,74 @@ class Vector:
                 angle += 180
             return angle
 
+
+
+#Preparing screen
+screen_width = 1680
+screen_height = 1050
+screen = pygame.display.set_mode((screen_width,screen_height))
+pygame.display.set_caption("RaceTrack")
+
+#Creating surfaces
+Track_surface = pygame.Surface((screen_width,screen_height))
+Racer_surface = pygame.Surface((screen_width,screen_height), pygame.SRCALPHA)
+
+
+
+#Track Graphics loading
+track = pygame.image.load("Tracks/Track01.png")
+
+#Racers Graphics loading
+racer1_gfx = pygame.image.load("Racers/racer01.png")
+racer2_gfx = pygame.image.load("Racers/racer01.png")
+white = (255, 255, 255)
+
+
+
+
+#Creating racer class
+class Racer:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def gfx(self):
+        self.gfx = pygame.image.load("gfx_path")
+
+    def mass(self):
+        self.mass = racer1_gfx.get_width() * racer1_gfx.get_height()
+
+    def draw(self):
+        Racer_surface.blit(self.gfx, (self.x, self.y))
+
+    def body(self):
+        pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
+
+
+#racer1 = pygame.Rect(screen_width // 2, screen_height // 2, racer1_gfx.get_width(), racer1_gfx.get_height())
+#racer2 = pygame.Rect(screen_width // 2, screen_height // 2, racer2_gfx.get_width(), racer2_gfx.get_height())
+
+#Racers
+
+racer1 = Racer(screen_width // 2, screen_height // 2)
+racer2 = Racer(screen_width // 2, screen_height // 2)
+
+
+
+
+
+
+
 #Racerspeed
 def_speed = 0
 racer1_speed = Vector(def_speed, def_speed)
 racer2_speed = Vector(def_speed, def_speed)
+
+Acceleration = 5 * racer1.mass
+Deceleration = 30
+Turning = 20
+
+
 
 
 #Creating clock
@@ -110,7 +153,7 @@ while True:
 
     #Drawing the track and the clear racer surface
     Track_surface.fill((255,255,255))
-    Track_surface.blit(track, (screen_width // 2 - 500,screen_height // 2 - 500))
+    Track_surface.blit(track, (screen_width // 2 - track.get_width // 2,screen_height // 2 - track.get_height // 2))
     Racer_surface.fill((0, 0, 0, 0))
 
 
