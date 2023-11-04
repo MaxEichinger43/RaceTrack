@@ -50,12 +50,10 @@ white = (255, 255, 255)
 
 #Creating racer class
 class Racer:
-    def __init__(self, x, y):
+    def __init__(self, x, y, gfx):
         self.x = x
         self.y = y
-
-    def gfx(self):
-        self.gfx = pygame.image.load("gfx_path")
+        self.gfx = pygame.image.load(gfx)
 
     def mass(self):
         self.mass = racer1_gfx.get_width() * racer1_gfx.get_height()
@@ -66,29 +64,32 @@ class Racer:
     def body(self):
         pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
 
+    def speed(self):
+        Vector(0, 0)
+
+    def acceleration(self):
+        5 * self.mass
+
+    def deceleration(self):
+        30 * self.mass
+
+    def Turning(self):
+        20 * self.mass
+
+
+
+
 
 #racer1 = pygame.Rect(screen_width // 2, screen_height // 2, racer1_gfx.get_width(), racer1_gfx.get_height())
 #racer2 = pygame.Rect(screen_width // 2, screen_height // 2, racer2_gfx.get_width(), racer2_gfx.get_height())
 
+
+
 #Racers
-
-racer1 = Racer(screen_width // 2, screen_height // 2)
-racer2 = Racer(screen_width // 2, screen_height // 2)
-
+racer1 = Racer(screen_width // 2, screen_height // 2, "Racers/racer01.png")
+racer2 = Racer(screen_width // 2, screen_height // 2, "Racers/racer02.png")
 
 
-
-
-
-
-#Racerspeed
-def_speed = 0
-racer1_speed = Vector(def_speed, def_speed)
-racer2_speed = Vector(def_speed, def_speed)
-
-Acceleration = 5 * racer1.mass
-Deceleration = 30
-Turning = 20
 
 
 
@@ -107,8 +108,8 @@ while True:
 
 
     #Calculate the rotation of the racers based on the x and y components  
-    rotRacer1 = racer1_speed.get_rotation()
-    rotRacer2 = racer2_speed.get_rotation()
+    rotRacer1 = racer1.speed.get_rotation()
+    rotRacer2 = racer2.speed.get_rotation()
 
 
     # Input system
@@ -116,37 +117,37 @@ while True:
 
     # Racer1
     if keys[pygame.K_w]:
-        racer1_speed.y -= 10
-        racer1_speed.x -= racer1_speed.x * 0.01
+        racer1.speed.y -= 10
+        racer1.speed.x -= racer1.speed.x * 0.01
     if keys[pygame.K_a]:
-        racer1_speed.x -= 10
-        racer1_speed.y -= racer1_speed.y * 0.01
+        racer1.speed.x -= 10
+        racer1.speed.y -= racer1.speed.y * 0.01
     if keys[pygame.K_s]:
-        racer1_speed.y += 10
-        racer1_speed.x -= racer1_speed.x * 0.01
+        racer1.speed.y += 10
+        racer1.speed.x -= racer1.speed.x * 0.01
     if keys[pygame.K_d]:
-        racer1_speed.x += 10
-        racer1_speed.y -= racer1_speed.y * 0.01
+        racer1.speed.x += 10
+        racer1.speed.y -= racer1.speed.y * 0.01
 
     # Racer2
     if keys[pygame.K_UP]:
-        racer2_speed.y -= 10
+        racer2.speed.y -= 10
     if keys[pygame.K_LEFT]:
-        racer2_speed.x -= 10
+        racer2.speed.x -= 10
     if keys[pygame.K_DOWN]:
-        racer2_speed.y += 10
+        racer2.speed.y += 10
     if keys[pygame.K_RIGHT]:
-        racer2_speed.x += 10
+        racer2.speed.x += 10
 
     # ...
 
-    racer1.y += racer1_speed.y * time
-    racer1.x += racer1_speed.x * time
+    racer1.y += racer1.speed.y * time
+    racer1.x += racer1.speed.x * time
 
     # ...
 
-    racer2.y += racer2_speed.y * time
-    racer2.x += racer2_speed.x * time
+    racer2.y += racer2.speed.y * time
+    racer2.x += racer2.speed.x * time
     #.........................................
 
 
