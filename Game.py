@@ -1,5 +1,6 @@
-import math
 import sys
+import math
+from numpy import arctan
 import pygame
 pygame.init()
 
@@ -34,6 +35,7 @@ racer1_speed_x = def_speed
 racer2_speed_y = def_speed
 racer2_speed_x = def_speed
 
+rotRacer1 = arctan(racer1_speed_x / racer1_speed_y)
 
 #Creating clock
 clock = pygame.time.Clock()
