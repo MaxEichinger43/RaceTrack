@@ -1,6 +1,6 @@
 import sys
 import math
-from numpy import arctan
+#from numpy import arctan
 import pygame
 pygame.init()
 
@@ -46,6 +46,9 @@ class Racer:
         if self.speed < self.max_speed:
             self.x += math.sin(math.radians(self.dir)) * self.speed * delta_time
             self.y -= math.cos(math.radians(self.dir)) * self.speed * delta_time
+        
+        self.y = min(max(self.y, screen_height // 2 - track.get_height // 2), screen_height // 2 + track.get_height // 2)
+        self.x = min(max(self.x, screen_width // 2 - track.get_width // 2), screen_width // 2 + track.get_width // 2)
 
 
 racer1 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer01.png")
@@ -103,17 +106,16 @@ if keys[pygame.K_RIGHT]:
     racer1.move()
     racer2.move()
 
-    
-    #Make sure the racers dont drive to ikea while racing
-    racer1.y = min(max(racer1.y, screen_height // 2 - 500), screen_height // 2 + 500)
-    racer1.x = min(max(racer1.x, screen_width // 2 - 500), screen_width // 2 + 500)
-    racer2.y = min(max(racer2.y, screen_height // 2 - 500), screen_height // 2 + 500)
-    racer2.x = min(max(racer2.x, screen_width // 2 - 500), screen_width // 2 + 500)
-    #.........................................
+
+    if debug_mode:
+        debug_text = f"Racer1 Speed: {racer1.speed:.2f}, Position: ({racer1.x:.2f}, {racer1.y:.2f}), Keys pressed: {keys}"
+        debug_surface = font.render(debug_text, True, (255, 255, 255))
+        screen.blit(debug_surface, (10, 10))
+
 
     #Drawing the track and the clear racer surface
     Track_surface.fill((255,255,255))
-    Track_surface.blit(track, (screen_width // 2 - 500,screen_height // 2 - 500))
+    Track_surface.blit(track, (screen_width // 2 - track.get_width // 2,screen_height // 2 - track.get_height // 2))
     Racer_surface.fill((0, 0, 0, 0))
 
     racer1.update_n_draw()
@@ -123,10 +125,7 @@ if keys[pygame.K_RIGHT]:
     screen.blit(Track_surface, (0, 0))
     screen.blit(Racer_surface, (0, 0))
 
-    if debug_mode:
-        debug_text = f"Racer1 Speed: {racer1.speed:.2f}, Position: ({racer1.x:.2f}, {racer1.y:.2f}), Keys pressed: {keys}"
-        debug_surface = font.render(debug_text, True, (255, 255, 255))
-        screen.blit(debug_surface, (10, 10))
+
     
     pygame.display.flip()
     pygame.display.update()
