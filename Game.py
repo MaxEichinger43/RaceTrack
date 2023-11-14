@@ -79,13 +79,10 @@ while RaceIsRunning:
         racer1.speed += acceleration * delta_time // racer1.mass 
     else:
         racer1.speed -= friction // racer1.mass
-
     if keys[pygame.K_a]:
         racer1.dir += 200 * delta_time
-
     if keys[pygame.K_s]:
         racer1.speed -= brake // racer1.mass
-
     if keys[pygame.K_d]:
         racer1.dir -= 200 * delta_time
 
