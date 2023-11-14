@@ -17,7 +17,7 @@ Track_surface = pygame.Surface((screen_width, screen_height))
 Racer_surface = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 
 # Track Graphics loading
-track = pygame.image.load("sprites/tracks/track01.png")
+track = pygame.image.load("sprites/tracks/track02.png")
 
 class Racer:
     def __init__(self, x, y, gfx):
@@ -63,6 +63,8 @@ while RaceIsRunning:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+    delta_time = clock.tick(120) / 1000.0
 
     # Input system
     keys = pygame.key.get_pressed()

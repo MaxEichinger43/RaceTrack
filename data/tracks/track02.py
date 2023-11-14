@@ -1,0 +1,5 @@
+road = (120, 120, 120)
+offroad = (0, 120, 0)
+start = (0, 0, 0)
+end = (0, 0, 0)
+track02 = (road, offroad, start, end)
