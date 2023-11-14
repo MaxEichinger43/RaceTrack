@@ -28,7 +28,7 @@ class Racer:
         self.dir = 0
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
-        self.max_speed = self.mass
+        #self.max_speed = self.mass
 
     def update_n_draw(self):
         self.body.x = self.x
@@ -38,9 +38,8 @@ class Racer:
         Racer_surface.blit(rotated_gfx, rotated_body)
 
     def move(self):
-        if self.speed < self.max_speed:
-            self.x += math.sin(math.radians(self.dir)) * self.speed * delta_time
-            self.y -= math.cos(math.radians(self.dir)) * self.speed * delta_time
+        self.x -= self.speed * math.sin(math.radians(self.dir)) * delta_time
+        self.y -= self.speed * math.cos(math.radians(self.dir)) * delta_time
 
         self.y = min(max(self.y, screen_height // 2 - track.get_height() // 2), screen_height // 2 + track.get_height() // 2)
         self.x = min(max(self.x, screen_width // 2 - track.get_width() // 2), screen_width // 2 + track.get_width() // 2)
@@ -51,7 +50,7 @@ racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.pn
 
 # Constants
 acceleration = 10
-friction = 0.1
+friction = 3
 brake = 20
 
 # Creating clock
@@ -71,35 +70,39 @@ while RaceIsRunning:
     keys = pygame.key.get_pressed()
 
     # Racer1
-    if keys[pygame.K_w]:
-        racer1.speed += acceleration * delta_time // racer1.mass
-    else:
-        racer1.speed -= friction // racer1.mass
+    if keys[pygame.K_w] and racer1.speed < 400:
+        racer1.speed += acceleration
+    elif racer1.speed > 0:
+        racer1.speed -= friction
     if keys[pygame.K_a]:
-        racer1.dir += 200 * delta_time
-    if keys[pygame.K_s]:
-        racer1.speed -= brake // racer1.mass
+        racer1.dir += 2
+    if keys[pygame.K_s] and racer1.speed > -100:
+        racer1.speed -= brake
     if keys[pygame.K_d]:
-        racer1.dir -= 200 * delta_time
+        racer1.dir -= 2
 
     # Racer2
-    if keys[pygame.K_UP]:
-        racer2.speed += acceleration * delta_time // racer2.mass
-    else:
-        racer2.speed -= friction // racer2.mass
+    if keys[pygame.K_UP] and racer2.speed < 400:
+        racer2.speed += acceleration
+    elif racer2.speed > 0:
+        racer2.speed -= friction
     if keys[pygame.K_LEFT]:
-        racer2.dir += 200 * delta_time
-    if keys[pygame.K_DOWN]:
-        racer2.speed -= brake // racer2.mass
+        racer2.dir += 2
+    if keys[pygame.K_DOWN] and racer2.speed > -100:
+        racer2.speed -= brake
     if keys[pygame.K_RIGHT]:
-        racer2.dir -= 200 * delta_time
+        racer2.dir -= 2
+
+    # Debug mode
+    if keys[pygame.K_F1]:
+        debug_mode = not debug_mode
 
     racer1.move()
     racer2.move()
 
     if debug_mode:
         debug_text = f"Racer1 Speed: {racer1.speed:.2f}, Position: ({racer1.x:.2f}, {racer1.y:.2f}), Keys pressed: {keys}"
-        debug_surface = font.render(debug_text, True, (255, 255, 255))
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 10))
 
     # Drawing the track and the clear racer surface
