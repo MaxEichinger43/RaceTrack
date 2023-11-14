@@ -28,7 +28,7 @@ class Racer:
         self.dir = 0
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
-        #self.max_speed = self.mass
+        self.max_speed = self.mass + 200
 
     def update_n_draw(self):
         self.body.x = self.x
@@ -49,9 +49,9 @@ racer1 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer01.pn
 racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.png")
 
 # Constants
-acceleration = 10
-friction = 3
-brake = 20
+acceleration = 3
+friction = 2
+brake = 10
 
 # Creating clock
 clock = pygame.time.Clock()
@@ -64,13 +64,11 @@ while RaceIsRunning:
             pygame.quit()
             sys.exit()
 
-    delta_time = clock.tick(120) / 1000.0
-
     # Input system
     keys = pygame.key.get_pressed()
 
     # Racer1
-    if keys[pygame.K_w] and racer1.speed < 400:
+    if keys[pygame.K_w] and racer1.speed < racer1.max_speed:
         racer1.speed += acceleration
     elif racer1.speed > 0:
         racer1.speed -= friction
@@ -78,11 +76,13 @@ while RaceIsRunning:
         racer1.dir += 2
     if keys[pygame.K_s] and racer1.speed > -100:
         racer1.speed -= brake
+    elif racer1.speed < 0:
+        racer1.speed += friction
     if keys[pygame.K_d]:
         racer1.dir -= 2
 
     # Racer2
-    if keys[pygame.K_UP] and racer2.speed < 400:
+    if keys[pygame.K_UP] and racer2.speed < racer2.max_speed:
         racer2.speed += acceleration
     elif racer2.speed > 0:
         racer2.speed -= friction
@@ -90,6 +90,8 @@ while RaceIsRunning:
         racer2.dir += 2
     if keys[pygame.K_DOWN] and racer2.speed > -100:
         racer2.speed -= brake
+    elif racer2.speed < 0:
+        racer2.speed += friction
     if keys[pygame.K_RIGHT]:
         racer2.dir -= 2
 
@@ -100,10 +102,6 @@ while RaceIsRunning:
     racer1.move()
     racer2.move()
 
-    if debug_mode:
-        debug_text = f"Racer1 Speed: {racer1.speed:.2f}, Position: ({racer1.x:.2f}, {racer1.y:.2f}), Keys pressed: {keys}"
-        debug_surface = font.render(debug_text, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 10))
 
     # Drawing the track and the clear racer surface
     Track_surface.fill((255, 255, 255))
@@ -116,6 +114,14 @@ while RaceIsRunning:
     # Blit the Track_surface and Racer_surface onto the screen
     screen.blit(Track_surface, (0, 0))
     screen.blit(Racer_surface, (0, 0))
+
+    if debug_mode:
+        debug_text1 = f"Racer1 Speed: {racer1.speed:.2f}"
+        debug_surface = font.render(debug_text1, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 10))
+        debug_text2 = f"Racer2 Speed: {racer2.speed:.2f}"
+        debug_surface = font.render(debug_text2, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 30))
 
     pygame.display.flip()
     pygame.display.update()
