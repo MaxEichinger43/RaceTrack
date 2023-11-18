@@ -1,6 +1,6 @@
+from os import DirEntry
 import sys
 import math
-from typing import Self
 import pygame
 pygame.init()
 
@@ -24,12 +24,12 @@ offroad = (0, 120, 0, 255)
 startingLine = (567 + screen_width // 2 - track.get_width() // 2, 80 + screen_height // 2 - track.get_height() // 2)
 
 class Racer:
-    def __init__(self, x, y, gfx):
+    def __init__(self, x, y, gfx, direction):
         self.x = x
         self.y = y
         self.gfx = pygame.image.load(gfx)
         self.speed = 0
-        self.dir = 0
+        self.direction = direction
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
         self.max_speed = self.mass + 300
@@ -42,7 +42,7 @@ class Racer:
     def update_n_draw(self):
         self.body.x = self.x
         self.body.y = self.y
-        rotated_gfx = pygame.transform.rotate(self.gfx, self.dir)
+        rotated_gfx = pygame.transform.rotate(self.gfx, self.direction)
         rotated_body = rotated_gfx.get_rect(center=self.body.center)
         Racer_surface.blit(rotated_gfx, rotated_body)
 
@@ -53,18 +53,18 @@ class Racer:
         elif ground == offroad:
             self.speed *= 0.97  # Reduce speed on offroad
 
-        direction_difference = abs(self.dir - math.degrees(math.atan2(self.speed * math.sin(math.radians(self.dir)), self.speed * math.cos(math.radians(self.dir)))))
-        if direction_difference > 5:
+        directionection_difference = abs(math.degrees(math.sin(self.direction)) - math.degrees(math.atan2(self.speed * math.sin(math.radians(self.direction)), self.speed * math.cos(math.radians(self.direction)))))
+        if directionection_difference > 5:
             self.drift = True
         else:
             self.drift = False
 
         if not self.drift:
-            self.x -= self.speed * math.sin(math.radians(self.dir)) * delta_time
-            self.y -= self.speed * math.cos(math.radians(self.dir)) * delta_time
+            self.x -= self.speed * math.sin(math.radians(self.direction)) * delta_time
+            self.y -= self.speed * math.cos(math.radians(self.direction)) * delta_time
         else:
-            self.x -= self.speed * math.sin(math.radians(self.dir)) * delta_time   # Reduce drift effect
-            self.y -= self.speed * math.cos(math.radians(self.dir)) * delta_time 
+            self.x -= self.speed * math.sin(math.radians(self.direction)) * delta_time   # Reduce drift effect
+            self.y -= self.speed * math.cos(math.radians(self.direction)) * delta_time 
 
         self.y = min(max(self.y, screen_height // 2 - track.get_height() // 2), screen_height // 2 + track.get_height() // 2)
         self.x = min(max(self.x, screen_width // 2 - track.get_width() // 2), screen_width // 2 + track.get_width() // 2)
@@ -96,13 +96,13 @@ while RaceIsRunning:
     elif racer1.speed > 0:
         racer1.speed -= racer1.resistance
     if keys[pygame.K_a]:
-        racer1.dir += 2
+        racer1.direction += 2
     if keys[pygame.K_s] and racer1.speed > -100:
         racer1.speed -= racer1.brake
     elif racer1.speed < 0:
         racer1.speed += racer1.resistance
     if keys[pygame.K_d]:
-        racer1.dir -= 2
+        racer1.direction -= 2
 
     # Racer2
     if keys[pygame.K_UP] and racer2.speed < racer2.max_speed:
@@ -110,13 +110,13 @@ while RaceIsRunning:
     elif racer2.speed > 0:
         racer2.speed -= racer2.resistance
     if keys[pygame.K_LEFT]:
-        racer2.dir += 2
+        racer2.direction += 2
     if keys[pygame.K_DOWN] and racer2.speed > -100:
         racer2.speed -= racer2.brake
     elif racer2.speed < 0:
         racer2.speed += racer2.resistance
     if keys[pygame.K_RIGHT]:
-        racer2.dir -= 2
+        racer2.direction -= 2
 
     # Debug mode
     if keys[pygame.K_F1]:
