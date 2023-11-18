@@ -1,5 +1,6 @@
 import sys
 import math
+from typing import Self
 import pygame
 pygame.init()
 
@@ -20,6 +21,7 @@ Racer_surface = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 track = pygame.image.load("sprites/tracks/track02.png")
 road = (120, 120, 120, 255)
 offroad = (0, 120, 0, 255)
+startingLine = (567 + screen_width // 2 - track.get_width() // 2, 80 + screen_height // 2 - track.get_height() // 2)
 
 class Racer:
     def __init__(self, x, y, gfx):
@@ -30,10 +32,12 @@ class Racer:
         self.dir = 0
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
-        self.max_speed = self.mass + 200
+        self.max_speed = self.mass + 300
         self.resistance = 3
         self.ground_friction = self.mass * self.max_speed * 0.7
         self.drift = False
+        self.acceleration = 3
+        self.brake = 10
 
     def update_n_draw(self):
         self.body.x = self.x
@@ -47,7 +51,7 @@ class Racer:
         if ground == road:
             self.speed = min(self.speed, self.max_speed)  # Limit speed on road
         elif ground == offroad:
-            self.speed *= 0.8  # Reduce speed on offroad
+            self.speed *= 0.97  # Reduce speed on offroad
 
         direction_difference = abs(self.dir - math.degrees(math.atan2(self.speed * math.sin(math.radians(self.dir)), self.speed * math.cos(math.radians(self.dir)))))
         if direction_difference > 5:
@@ -59,19 +63,16 @@ class Racer:
             self.x -= self.speed * math.sin(math.radians(self.dir)) * delta_time
             self.y -= self.speed * math.cos(math.radians(self.dir)) * delta_time
         else:
-            self.x -= self.speed * math.sin(math.radians(self.dir)) * delta_time * 0.5  # Reduce drift effect
-            self.y -= self.speed * math.cos(math.radians(self.dir)) * delta_time * 0.5
+            self.x -= self.speed * math.sin(math.radians(self.dir)) * delta_time   # Reduce drift effect
+            self.y -= self.speed * math.cos(math.radians(self.dir)) * delta_time 
 
         self.y = min(max(self.y, screen_height // 2 - track.get_height() // 2), screen_height // 2 + track.get_height() // 2)
         self.x = min(max(self.x, screen_width // 2 - track.get_width() // 2), screen_width // 2 + track.get_width() // 2)
 
 # Create racer instances
-racer1 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer01.png")
+racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer01.png")
 racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.png")
 
-# Constants
-acceleration = 3
-brake = 10
 
 # Creating clock
 clock = pygame.time.Clock()
@@ -91,13 +92,13 @@ while RaceIsRunning:
 
     # Racer1
     if keys[pygame.K_w] and racer1.speed < racer1.max_speed:
-        racer1.speed += acceleration
+        racer1.speed += racer1.acceleration
     elif racer1.speed > 0:
         racer1.speed -= racer1.resistance
     if keys[pygame.K_a]:
         racer1.dir += 2
     if keys[pygame.K_s] and racer1.speed > -100:
-        racer1.speed -= brake
+        racer1.speed -= racer1.brake
     elif racer1.speed < 0:
         racer1.speed += racer1.resistance
     if keys[pygame.K_d]:
@@ -105,13 +106,13 @@ while RaceIsRunning:
 
     # Racer2
     if keys[pygame.K_UP] and racer2.speed < racer2.max_speed:
-        racer2.speed += acceleration
+        racer2.speed += racer2.acceleration
     elif racer2.speed > 0:
         racer2.speed -= racer2.resistance
     if keys[pygame.K_LEFT]:
         racer2.dir += 2
     if keys[pygame.K_DOWN] and racer2.speed > -100:
-        racer2.speed -= brake
+        racer2.speed -= racer2.brake
     elif racer2.speed < 0:
         racer2.speed += racer2.resistance
     if keys[pygame.K_RIGHT]:
