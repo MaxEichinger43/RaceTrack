@@ -23,13 +23,17 @@ road = (120, 120, 120, 255)
 offroad = (0, 120, 0, 255)
 startingLine = (567 + screen_width // 2 - track.get_width() // 2, 80 + screen_height // 2 - track.get_height() // 2)
 
+delta_time = 120//1000
+
 class Racer:
     def __init__(self, x, y, gfx, direction):
         self.x = x
         self.y = y
         self.gfx = pygame.image.load(gfx)
-        self.speed = 0
         self.direction = direction
+        self.speed = 0
+        self.speed_x = self.speed * math.sin(math.radians(self.direction)) * delta_time
+        self.speed_y = self.speed * math.cos(math.radians(self.direction)) * delta_time
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
         self.max_speed = self.mass + 300
@@ -53,15 +57,15 @@ class Racer:
         elif ground == offroad:
             self.speed *= 0.97  # Reduce speed on offroad
 
-        directionection_difference = abs(math.degrees(math.sin(self.direction)) - math.degrees(math.atan2(self.speed * math.sin(math.radians(self.direction)), self.speed * math.cos(math.radians(self.direction)))))
-        if directionection_difference > 5:
+        dermarkusdifference = abs(math.degrees(math.sin(self.direction)) - math.degrees(math.atan2(self.speed * math.sin(math.radians(self.direction)), self.speed * math.cos(math.radians(self.direction)))))
+        if dermarkusdifference > 5:
             self.drift = True
         else:
             self.drift = False
 
         if not self.drift:
-            self.x -= self.speed * math.sin(math.radians(self.direction)) * delta_time
-            self.y -= self.speed * math.cos(math.radians(self.direction)) * delta_time
+            self.x -= self.speed_x
+            self.y -= self.speed_y
         else:
             self.x -= self.speed * math.sin(math.radians(self.direction)) * delta_time   # Reduce drift effect
             self.y -= self.speed * math.cos(math.radians(self.direction)) * delta_time 
@@ -70,8 +74,8 @@ class Racer:
         self.x = min(max(self.x, screen_width // 2 - track.get_width() // 2), screen_width // 2 + track.get_width() // 2)
 
 # Create racer instances
-racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer01.png")
-racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.png")
+racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer03(dermark)us.png", 90)
+racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.png", 90)
 
 
 # Creating clock
@@ -123,6 +127,8 @@ while RaceIsRunning:
         debug_mode = not debug_mode
 
     racer1.move()
+
+
     racer2.move()
 
     # Drawing the track and the clear racer surface
@@ -152,6 +158,7 @@ while RaceIsRunning:
         debug_text4 = f"Drift R2: {racer2.drift}"
         debug_surface = font.render(debug_text4, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 70))
+
 
     pygame.display.flip()
     pygame.display.update()
