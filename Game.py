@@ -1,6 +1,6 @@
-from os import DirEntry
 import sys
 import math
+from typing import Self
 import pygame
 pygame.init()
 
@@ -22,6 +22,8 @@ track = pygame.image.load("sprites/tracks/track02.png")
 road = (120, 120, 120, 255)
 offroad = (0, 120, 0, 255)
 startingLine = (567 + screen_width // 2 - track.get_width() // 2, 80 + screen_height // 2 - track.get_height() // 2)
+startingBox = pygame.Rect(564 + screen_width // 2 - track.get_width() // 2, 0 + screen_height // 2 - track.get_height() // 2, 568 + screen_width // 2 - track.get_width() // 2, 170 + screen_height // 2 - track.get_height() // 2)
+checkPoint1 = pygame.Rect(585 + screen_width // 2 - track.get_width() // 2, 720 + screen_height // 2 - track.get_height() // 2, 605 + screen_width // 2 - track.get_width() // 2, 950 + screen_height // 2 - track.get_height() // 2)
 
 delta_time = 120//1000
 
@@ -36,13 +38,14 @@ class Racer:
         self.speed_y = self.speed * math.cos(math.radians(self.direction)) * delta_time
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
-        self.body_front = pygame.Rect(self.x, self.y // 2, self.gfx.get_width(), self.gfx.get_height() // 2)
         self.max_speed = self.mass + 300
         self.resistance = 3
         self.ground_friction = self.mass * self.max_speed * 0.7
         self.drift = False
         self.acceleration = 3
         self.brake = 10
+        self.lap = 1
+        self.check = False
 
     def update_n_draw(self):
         self.body.x = self.x
@@ -50,6 +53,12 @@ class Racer:
         rotated_gfx = pygame.transform.rotate(self.gfx, self.direction)
         rotated_body = rotated_gfx.get_rect(center=self.body.center)
         Racer_surface.blit(rotated_gfx, rotated_body)
+
+        if self.body.colliderect(checkPoint1):
+            self.check = True
+        if self.body.colliderect(startingBox) and self.check:
+            self.lap += 1
+            self.check = False
 
     def move(self):
         ground = Track_surface.get_at((int(self.x + self.gfx.get_width() // 2), int(self.y + self.gfx.get_height() // 2)))
@@ -129,19 +138,24 @@ while RaceIsRunning:
         debug_mode = not debug_mode
 
 
-    if racer1.body.colliderect(racer2.body):
+#    if racer1.body.colliderect(racer2.body):
+#
+#        phaseDiff_x = racer2.speed_x - racer1.speed_x
+#        phaseDiff_y = racer2.speed_y - racer1.speed_y
+#
+#        racer1.speed_x += phaseDiff_x * racer2.mass / racer1.mass *1000
+#        racer1.speed_y += phaseDiff_y * racer2.mass / racer1.mass *1000
+#
+#        racer2.speed_x -= phaseDiff_x * racer1.mass / racer2.mass *1000
+#        racer2.speed_y -= phaseDiff_y * racer1.mass / racer2.mass *1000
+#
+#
+#        Collision1o2 = True
+#        
+#    else:
+#        Collision1o2 = False
 
-        phaseDiff = racer1.direction - racer2.direction 
-        racer1.speed_x = 
-
-
-
-        Collision1o2 = True
-        
-    else:
-        racer1.move()
-        Collision1o2 = False
-
+    racer1.move()
     racer2.move()
 
     # Drawing the track and the clear racer surface
@@ -176,9 +190,6 @@ while RaceIsRunning:
         debug_surface = font.render(debug_text5, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 90))
 
-        debug_text6 = f"PhasenMarkusDir: {}"
-        debug_surface = font.render(debug_text6, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 110))
 
 
     pygame.display.flip()
