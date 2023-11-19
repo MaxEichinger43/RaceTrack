@@ -22,7 +22,7 @@ track = pygame.image.load("sprites/tracks/track02.png")
 road = (120, 120, 120, 255)
 offroad = (0, 120, 0, 255)
 startingLine = (567 + screen_width // 2 - track.get_width() // 2, 80 + screen_height // 2 - track.get_height() // 2)
-startingBox = pygame.Rect(564 + screen_width // 2 - track.get_width() // 2, 0 + screen_height // 2 - track.get_height() // 2, 568 + screen_width // 2 - track.get_width() // 2, 170 + screen_height // 2 - track.get_height() // 2)
+startingBox = pygame.Rect(564 + screen_width // 2 - track.get_width() // 2, 50 + screen_height // 2 - track.get_height() // 2, 568 + screen_width // 2 - track.get_width() // 2, 150 + screen_height // 2 - track.get_height() // 2)
 checkPoint1 = pygame.Rect(585 + screen_width // 2 - track.get_width() // 2, 720 + screen_height // 2 - track.get_height() // 2, 605 + screen_width // 2 - track.get_width() // 2, 950 + screen_height // 2 - track.get_height() // 2)
 
 delta_time = 120//1000
@@ -85,7 +85,7 @@ class Racer:
 
 # Create racer instances
 racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer03(dermark)us.png", 90)
-racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.png", 90)
+racer2 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer02.png", 90)
 
 Collision1o2 = False
 
@@ -189,6 +189,13 @@ while RaceIsRunning:
         debug_text5 = f"Collision: {Collision1o2}"
         debug_surface = font.render(debug_text5, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 90))
+
+        debug_text3 = f"Lap R1: {racer1.lap}"
+        debug_surface = font.render(debug_text3, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 110))
+        debug_text4 = f"Lap R2: {racer2.lap}"
+        debug_surface = font.render(debug_text4, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 130))
 
 
 
