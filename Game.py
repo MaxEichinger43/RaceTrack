@@ -36,6 +36,7 @@ class Racer:
         self.speed_y = self.speed * math.cos(math.radians(self.direction)) * delta_time
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
+        self.body_front = pygame.Rect(self.x, self.y // 2, self.gfx.get_width(), self.gfx.get_height() // 2)
         self.max_speed = self.mass + 300
         self.resistance = 3
         self.ground_friction = self.mass * self.max_speed * 0.7
@@ -77,6 +78,7 @@ class Racer:
 racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer03(dermark)us.png", 90)
 racer2 = Racer(screen_width // 2, screen_height // 2, "sprites/racers/racer02.png", 90)
 
+Collision1o2 = False
 
 # Creating clock
 clock = pygame.time.Clock()
@@ -126,8 +128,19 @@ while RaceIsRunning:
     if keys[pygame.K_F1]:
         debug_mode = not debug_mode
 
-    racer1.move()
 
+    if racer1.body.colliderect(racer2.body):
+
+        phaseDiff = racer1.direction - racer2.direction 
+        racer1.speed_x = 
+
+
+
+        Collision1o2 = True
+        
+    else:
+        racer1.move()
+        Collision1o2 = False
 
     racer2.move()
 
@@ -158,6 +171,14 @@ while RaceIsRunning:
         debug_text4 = f"Drift R2: {racer2.drift}"
         debug_surface = font.render(debug_text4, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 70))
+
+        debug_text5 = f"Collision: {Collision1o2}"
+        debug_surface = font.render(debug_text5, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 90))
+
+        debug_text6 = f"PhasenMarkusDir: {}"
+        debug_surface = font.render(debug_text6, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 110))
 
 
     pygame.display.flip()
