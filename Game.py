@@ -1,11 +1,8 @@
 import sys
 import math
-from typing import Self
 import pygame
 pygame.init()
 
-debug_mode = True
-font = pygame.font.Font(None, 24)
 
 # Preparing screen
 screen_width = 1680
@@ -17,15 +14,34 @@ pygame.display.set_caption("RaceTrack")
 Track_surface = pygame.Surface((screen_width, screen_height))
 Racer_surface = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 
-# Track Graphics loading
-track = pygame.image.load("sprites/tracks/track02.png")
-road = (120, 120, 120, 255)
-offroad = (0, 120, 0, 255)
-startingLine = (567 + screen_width // 2 - track.get_width() // 2, 80 + screen_height // 2 - track.get_height() // 2)
-startingBox = pygame.Rect(564 + screen_width // 2 - track.get_width() // 2, 50 + screen_height // 2 - track.get_height() // 2, 568 + screen_width // 2 - track.get_width() // 2, 150 + screen_height // 2 - track.get_height() // 2)
-checkPoint1 = pygame.Rect(585 + screen_width // 2 - track.get_width() // 2, 720 + screen_height // 2 - track.get_height() // 2, 605 + screen_width // 2 - track.get_width() // 2, 950 + screen_height // 2 - track.get_height() // 2)
 
+debug_mode = True
+font = pygame.font.Font(None, 24)
 delta_time = 120//1000
+clock = pygame.time.Clock()
+
+
+
+
+
+# Import track n stuff
+def import_track():
+    global track, road, offroad, startingLine, startingBox, checkPoint1, track_center_x, track_center_y
+    track = pygame.image.load("sprites/tracks/track02.png")
+    road = (120, 120, 120, 255)
+    offroad = (0, 120, 0, 255)
+
+    track_center_x = screen_width // 2 - track.get_width() // 2
+    track_center_y = screen_height // 2 - track.get_height() // 2
+
+    startingLine = (567 + track_center_x, 80 + track_center_y)
+    startingBox = pygame.Rect(566 + track_center_x, 51 + track_center_y, 2, 106)
+
+    checkPoint1 = pygame.Rect(600 + track_center_x, 740 + track_center_y, 2, 370)
+import_track()
+
+
+
 
 class Racer:
     def __init__(self, x, y, gfx, direction):
@@ -38,14 +54,15 @@ class Racer:
         self.speed_y = self.speed * math.cos(math.radians(self.direction)) * delta_time
         self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.body = pygame.Rect(self.x, self.y, self.gfx.get_width(), self.gfx.get_height())
-        self.max_speed = self.mass + 300
+        self.max_speed = 500
         self.resistance = 3
         self.ground_friction = self.mass * self.max_speed * 0.7
         self.drift = False
         self.acceleration = 3
+        self.acc = False
         self.brake = 10
         self.lap = 1
-        self.check = False
+        self.check1 = False
 
     def update_n_draw(self):
         self.body.x = self.x
@@ -54,43 +71,112 @@ class Racer:
         rotated_body = rotated_gfx.get_rect(center=self.body.center)
         Racer_surface.blit(rotated_gfx, rotated_body)
 
+        self.speed_x = self.speed * math.sin(math.radians(self.direction)) * delta_time
+        self.speed_y = self.speed * math.cos(math.radians(self.direction)) * delta_time
+
         if self.body.colliderect(checkPoint1):
-            self.check = True
-        if self.body.colliderect(startingBox) and self.check:
+            self.check1 = True
+        if self.body.colliderect(startingBox) and self.check1:
             self.lap += 1
-            self.check = False
+            self.check1 = False
+
+    def handle_Collision(self):
+        if self.body.colliderect(startingBox):
+            if self.speed_x < 0:
+                self.speed_x = -self.speed_x
+            else:
+                pass
+        pass
 
     def move(self):
         ground = Track_surface.get_at((int(self.x + self.gfx.get_width() // 2), int(self.y + self.gfx.get_height() // 2)))
         if ground == road:
-            self.speed = min(self.speed, self.max_speed)  # Limit speed on road
+            self.speed = self.speed
         elif ground == offroad:
             self.speed *= 0.97  # Reduce speed on offroad
 
-        dermarkusdifference = abs(math.degrees(math.sin(self.direction)) - math.degrees(math.atan2(self.speed * math.sin(math.radians(self.direction)), self.speed * math.cos(math.radians(self.direction)))))
-        if dermarkusdifference > 5:
-            self.drift = True
-        else:
-            self.drift = False
+        self.x -= self.speed_x
+        self.handle_Collision()
+        self.y -= self.speed_y
+        self.handle_Collision()
 
-        if not self.drift:
-            self.x -= self.speed_x
-            self.y -= self.speed_y
-        else:
-            self.x -= self.speed * math.sin(math.radians(self.direction)) * delta_time   # Reduce drift effect
-            self.y -= self.speed * math.cos(math.radians(self.direction)) * delta_time 
+        if self.speed > -5 and self.speed < 5 and not self.acc:
+            self.speed = 0
 
-        self.y = min(max(self.y, screen_height // 2 - track.get_height() // 2), screen_height // 2 + track.get_height() // 2)
-        self.x = min(max(self.x, screen_width // 2 - track.get_width() // 2), screen_width // 2 + track.get_width() // 2)
+        self.y = min(max(self.y, track_center_y), screen_height // 2 + track.get_height() // 2 - self.gfx.get_height())
+        self.x = min(max(self.x, track_center_x), screen_width // 2 + track.get_width() // 2 - self.gfx.get_width())
+
 
 # Create racer instances
 racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer03(dermark)us.png", 90)
 racer2 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer02.png", 90)
 
-Collision1o2 = False
 
-# Creating clock
-clock = pygame.time.Clock()
+
+
+
+def racer1_handle_input(racer1, keys):
+    if keys[pygame.K_w] and racer1.speed < racer1.max_speed:
+        racer1.acc = True
+        racer1.speed += racer1.acceleration
+    elif racer1.speed > 0:
+        racer1.speed -= racer1.resistance
+    if keys[pygame.K_a]:
+        racer1.direction += 2
+    if keys[pygame.K_s] and racer1.speed > -100:
+        racer1.acc = True
+        racer1.speed -= racer1.brake
+    elif racer1.speed < 0:
+        racer1.speed += racer1.resistance
+    if keys[pygame.K_d]:
+        racer1.direction -= 2
+    racer1.move()
+
+def racer2_handle_input(racer2, keys):
+    if keys[pygame.K_UP] and racer2.speed < racer2.max_speed:
+        racer2.acc = True
+        racer2.speed += racer2.acceleration
+    elif racer2.speed > 0:
+        racer2.speed -= racer2.resistance
+    if keys[pygame.K_LEFT]:
+        racer2.direction += 2
+    if keys[pygame.K_DOWN] and racer2.speed > -100:
+        racer2.acc = True
+        racer2.speed -= racer2.brake
+    elif racer2.speed < 0:
+        racer2.speed += racer2.resistance
+    if keys[pygame.K_RIGHT]:
+        racer2.direction -= 2
+    racer2.move()
+
+def debug(screen, debug_mode, font, racer1, racer2, keys):
+    if keys[pygame.K_F1]:
+        debug_mode = not debug_mode
+    if debug_mode:
+        debug_text = f"Racer1 Speed: {racer1.speed:.0f}"
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 10))
+
+        debug_text = f"Racer2 Speed: {racer2.speed:.0f}"
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 30))
+
+        debug_text = f"Drift R1: {racer1.drift}"
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 50))
+        debug_text = f"Drift R2: {racer2.drift}"
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 70))
+
+        debug_text = f"Lap R1: {racer1.lap}"
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 110))
+        debug_text = f"Lap R2: {racer2.lap}"
+        debug_surface = font.render(debug_text, True, (255, 0, 0))
+        screen.blit(debug_surface, (10, 130))
+        
+
+
 
 # Gameloop
 RaceIsRunning = True
@@ -104,63 +190,12 @@ while RaceIsRunning:
 
     # Input system
     keys = pygame.key.get_pressed()
-
-    # Racer1
-    if keys[pygame.K_w] and racer1.speed < racer1.max_speed:
-        racer1.speed += racer1.acceleration
-    elif racer1.speed > 0:
-        racer1.speed -= racer1.resistance
-    if keys[pygame.K_a]:
-        racer1.direction += 2
-    if keys[pygame.K_s] and racer1.speed > -100:
-        racer1.speed -= racer1.brake
-    elif racer1.speed < 0:
-        racer1.speed += racer1.resistance
-    if keys[pygame.K_d]:
-        racer1.direction -= 2
-
-    # Racer2
-    if keys[pygame.K_UP] and racer2.speed < racer2.max_speed:
-        racer2.speed += racer2.acceleration
-    elif racer2.speed > 0:
-        racer2.speed -= racer2.resistance
-    if keys[pygame.K_LEFT]:
-        racer2.direction += 2
-    if keys[pygame.K_DOWN] and racer2.speed > -100:
-        racer2.speed -= racer2.brake
-    elif racer2.speed < 0:
-        racer2.speed += racer2.resistance
-    if keys[pygame.K_RIGHT]:
-        racer2.direction -= 2
-
-    # Debug mode
-    if keys[pygame.K_F1]:
-        debug_mode = not debug_mode
-
-
-#    if racer1.body.colliderect(racer2.body):
-#
-#        phaseDiff_x = racer2.speed_x - racer1.speed_x
-#        phaseDiff_y = racer2.speed_y - racer1.speed_y
-#
-#        racer1.speed_x += phaseDiff_x * racer2.mass / racer1.mass *1000
-#        racer1.speed_y += phaseDiff_y * racer2.mass / racer1.mass *1000
-#
-#        racer2.speed_x -= phaseDiff_x * racer1.mass / racer2.mass *1000
-#        racer2.speed_y -= phaseDiff_y * racer1.mass / racer2.mass *1000
-#
-#
-#        Collision1o2 = True
-#        
-#    else:
-#        Collision1o2 = False
-
-    racer1.move()
-    racer2.move()
+    racer1_handle_input(racer1, keys)
+    racer2_handle_input(racer2, keys)
 
     # Drawing the track and the clear racer surface
     Track_surface.fill((255, 255, 255))
-    Track_surface.blit(track, (screen_width // 2 - track.get_width() // 2, screen_height // 2 - track.get_height() // 2))
+    Track_surface.blit(track, (track_center_x, track_center_y))
     Racer_surface.fill((0, 0, 0, 0))
 
     racer1.update_n_draw()
@@ -170,34 +205,7 @@ while RaceIsRunning:
     screen.blit(Track_surface, (0, 0))
     screen.blit(Racer_surface, (0, 0))
 
-    if debug_mode:
-        debug_text1 = f"Racer1 Speed: {racer1.speed:.2f}"
-        debug_surface = font.render(debug_text1, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 10))
-
-        debug_text2 = f"Racer2 Speed: {racer2.speed:.2f}"
-        debug_surface = font.render(debug_text2, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 30))
-
-        debug_text3 = f"Drift R1: {racer1.drift}"
-        debug_surface = font.render(debug_text3, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 50))
-        debug_text4 = f"Drift R2: {racer2.drift}"
-        debug_surface = font.render(debug_text4, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 70))
-
-        debug_text5 = f"Collision: {Collision1o2}"
-        debug_surface = font.render(debug_text5, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 90))
-
-        debug_text3 = f"Lap R1: {racer1.lap}"
-        debug_surface = font.render(debug_text3, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 110))
-        debug_text4 = f"Lap R2: {racer2.lap}"
-        debug_surface = font.render(debug_text4, True, (255, 0, 0))
-        screen.blit(debug_surface, (10, 130))
-
-
+    debug(screen, debug_mode, font, racer1, racer2, keys)
 
     pygame.display.flip()
     pygame.display.update()
