@@ -1,3 +1,4 @@
+import random
 import sys
 import math
 import pygame
@@ -13,6 +14,7 @@ pygame.display.set_caption("RaceTrack")
 # Creating surfaces
 Track_surface = pygame.Surface((screen_width, screen_height))
 Racer_surface = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+MainMenue_surface = pygame.Surface((screen_width, screen_height))
 
 
 debug_mode = True
@@ -20,6 +22,8 @@ font = pygame.font.Font(None, 24)
 delta_time = 120//1000
 clock = pygame.time.Clock()
 
+
+black = (0, 0, 0)
 
 
 
@@ -41,6 +45,18 @@ def import_track():
 import_track()
 
 
+class FakeRacer:
+    def __init__(self, x, y, gfx):
+        self.x = x
+        self.y = y
+        self.gfx = gfx
+
+    def move(self, speed):
+        self.x += speed
+
+    def draw(self):
+        MainMenue_surface.blit(pygame.transform.rotate(self.gfx, 90), (self.x, self.y))
+        
 
 
 class Racer:
@@ -175,38 +191,74 @@ def debug(screen, debug_mode, font, racer1, racer2, keys):
         debug_surface = font.render(debug_text, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 130))
         
-
+fakeRacer1 = FakeRacer(50, 800, pygame.image.load("sprites/racers/racer01.png"))
 
 
 # Gameloop
+
+MainMenue = True
 RaceIsRunning = True
-while RaceIsRunning:
+GameIsRunning = True
+while GameIsRunning:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            RaceIsRunning = False
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            GameIsRunning = False
 
-    delta_time = clock.tick(120) / 1000.0
 
-    # Input system
-    keys = pygame.key.get_pressed()
-    racer1_handle_input(racer1, keys)
-    racer2_handle_input(racer2, keys)
 
-    # Drawing the track and the clear racer surface
-    Track_surface.fill((255, 255, 255))
-    Track_surface.blit(track, (track_center_x, track_center_y))
-    Racer_surface.fill((0, 0, 0, 0))
 
-    racer1.update_n_draw()
-    racer2.update_n_draw()
+    while MainMenue:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                MainMenue, GameIsRunning, RaceIsRunning = False
+            elif event.type == pygame.KEYDOWN and not event.type == pygame.K_ESCAPE:
+                MainMenue = False
+                
+        StartinScreen = pygame.image.load("sprites/menue/starting_screen.png")
 
-    # Blit the Track_surface and Racer_surface onto the screen
-    screen.blit(Track_surface, (0, 0))
-    screen.blit(Racer_surface, (0, 0))
+        #fakeRacer1 = FakeRacer(50, 800, pygame.image.load("sprites/racers/racer01.png"))
+        fakeRacer1.move(random.randrange(100,700,10))
+        fakeRacer1.draw()
 
-    debug(screen, debug_mode, font, racer1, racer2, keys)
+        MainMenue_surface.blit(StartinScreen, (0,0))
 
-    pygame.display.flip()
-    pygame.display.update()
-    clock.tick(120)
+        screen.blit(MainMenue_surface, (0, 0))
+        pygame.display.update()
+        clock.tick(120)
+
+
+
+
+
+
+    while RaceIsRunning:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                RaceIsRunning, MainMenue, GameIsRunning = False
+            if event.type == event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
+                RaceIsRunning, MainMenue = False, True
+
+        delta_time = clock.tick(120) / 1000.0
+
+        # Input system
+        keys = pygame.key.get_pressed()
+        racer1_handle_input(racer1, keys)
+        racer2_handle_input(racer2, keys)
+
+        # Drawing the track and the clear racer surface
+        Track_surface.fill((255, 255, 255))
+        Track_surface.blit(track, (track_center_x, track_center_y))
+        Racer_surface.fill((0, 0, 0, 0))
+
+        racer1.update_n_draw()
+        racer2.update_n_draw()
+
+        # Blit the Track_surface and Racer_surface onto the screen
+        screen.blit(Track_surface, (0, 0))
+        screen.blit(Racer_surface, (0, 0))
+
+        debug(screen, debug_mode, font, racer1, racer2, keys)
+
+        pygame.display.update()
+        clock.tick(120)
 pygame.quit()
