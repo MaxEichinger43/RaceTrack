@@ -183,8 +183,7 @@ RaceIsRunning = True
 while RaceIsRunning:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+            RaceIsRunning = False
 
     delta_time = clock.tick(120) / 1000.0
 
@@ -210,3 +209,4 @@ while RaceIsRunning:
     pygame.display.flip()
     pygame.display.update()
     clock.tick(120)
+pygame.quit()
