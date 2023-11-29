@@ -53,12 +53,15 @@ class FakeRacer:
         self.x = x
         self.y = y
         self.gfx = gfx
+        self.sped = []
 
     def move(self, speed):
-        self.x += speed
+        self.sped.append(speed)
+        self.x += self.sped[0] * 0.1
+        self.draw()
 
     def draw(self):
-        MainMenue_surface.blit(pygame.transform.rotate(self.gfx, 90), (self.x, self.y))
+        MainMenue_surface.blit(pygame.transform.rotate(self.gfx, -90), (self.x, self.y))
         
 
 
@@ -194,7 +197,6 @@ def debug(screen, debug_mode, font, racer1, racer2, keys):
         debug_surface = font.render(debug_text, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 130))
         
-fakeRacer1 = FakeRacer(50, 800, pygame.image.load("sprites/racers/racer01.png"))
 
 
 # Gameloop
@@ -208,6 +210,11 @@ while GameIsRunning:
             GameIsRunning = False
 
 
+        StartinScreen = pygame.image.load("sprites/menue/starting_screen.png")
+
+        fakeRacer1 = FakeRacer(-50, 630, pygame.image.load("sprites/racers/racer01.png"))
+        fakeRacer2 = FakeRacer(-50, 700, pygame.image.load("sprites/racers/racer02.png"))
+
 
 
     while MainMenue:
@@ -217,13 +224,11 @@ while GameIsRunning:
             elif event.type == pygame.KEYDOWN and not event.type == pygame.K_ESCAPE:
                 MainMenue = False
                 
-        StartinScreen = pygame.image.load("sprites/menue/starting_screen.png")
-
-        #fakeRacer1 = FakeRacer(50, 800, pygame.image.load("sprites/racers/racer01.png"))
-        fakeRacer1.move(random.randrange(100,700,10))
-        fakeRacer1.draw()
-
         MainMenue_surface.blit(StartinScreen, (0,0))
+        fakeRacer1.move(random.randrange(50,200,10))
+        fakeRacer2.move(random.randrange(50,200,10))
+
+
 
         screen.blit(MainMenue_surface, (0, 0))
         pygame.display.update()

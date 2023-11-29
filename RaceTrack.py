@@ -1,6 +1,9 @@
+import sys
 import pygame
 import math
 import random
+
+from Game import GameIsRunning, MainMenue_surface
 pygame.init()
 pygame.display.set_caption("RaceTrack")
 
@@ -26,12 +29,14 @@ white, black, red, green, blue, yellow, magenta, cyan, gray, light_gray, dark_gr
     (64, 64, 64), (255, 165, 0), (128, 0, 128), (255, 182, 193), (165, 42, 42), (128, 128, 0))
 
 
+main_Menue = True
+
 
 
 # ---Funktions
 
 def imoprt_track():
-    global track, road, offroad, startingLine, startingBox, checkPoint1, track_center_x, track_center_y
+    global track, road, offroad, startingLine, startingBox, checkPoints, track_center_x, track_center_y
     track = pygame.image.load("sprites/tracks/track02.png")
     road = (120, 120, 120, 255)
     offroad = (0, 120, 0, 255)
@@ -115,6 +120,24 @@ def debug(screen, debug_mode, font, racer1, racer2, keys):
 
 
 
+# Main menue
+
+def Main_Menue():
+    global main_Menue
+    background = pygame.image.load("sprites/menue/starting_screen.png")
+    
+
+    while main_Menue:
+        for event in pygame.event.get():
+            if event == pygame.KEYDOWN and (event == pygame.K_ESCAPE):
+                pygame.QUIT()
+            elif event == pygame.KEYDOWN:
+                main_Menue
+                main_Menue = False
+        MainMenue_surface.blit(background, (0,0))
+
+
+
 
 # ---Classes
         
@@ -123,12 +146,15 @@ class FakeRacer:
         self.x = x
         self.y = y
         self.gfx = gfx
+        self.sped = []
 
     def move(self, speed):
-        self.x += speed
+        self.sped.append(speed)
+        self.x += self.sped[0] * 0.1
+        self.draw()
 
     def draw(self):
-        Menue_surf.blit(pygame.transform.rotate(self.gfx, 90), (self.x, self.y))
+        MainMenue_surface.blit(pygame.transform.rotate(self.gfx, -90), (self.x, self.y))
 
 
 
@@ -161,11 +187,11 @@ class Racer:
         self.body.update()
         self.speed_Vec.update()
 
-        if self.body.colliderect(checkpoints):
-            self.check1 = True
-        if self.body.colliderect(startingBox) and self.check1:
+        if self.body.colliderect(checkPoints):
+            self.checks.append(1)
+        if self.body.colliderect(startingBox) and self.checks:
             self.lap += 1
-            self.check1 = False
+            self.checks.clear()
 
     def handle_Collision(self):
         if self.body.colliderect(startingBox):
@@ -189,5 +215,14 @@ class Racer:
         if self.speed > -5 and self.speed < 5 and not self.acc:
             self.speed = 0
 
-        self.y = min(self.max_acc_speed(self.y, track_center_y), screen_height // 2 + track.get_height() // 2 - self.gfx.get_height())
-        self.x = min(self.max_acc_speed(self.x, track_center_x), screen_width // 2 + track.get_width() // 2 - self.gfx.get_width())
+            self.y = min(max(self.y, track_center_y), screen_height // 2 + track.get_height() // 2 - self.gfx.get_height())
+            self.x = min(max(self.x, track_center_x), screen_width // 2 + track.get_width() // 2 - self.gfx.get_width())
+
+
+while GameIsRunning:
+    for event in pygame.event.get():
+        if event == pygame.QUIT:
+            pygame.QUIT()
+            sys.exit()
+    
+    Main_Menue()
