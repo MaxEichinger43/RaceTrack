@@ -2,8 +2,6 @@ import sys
 import pygame
 import math
 import random
-
-from Game import GameIsRunning, MainMenue_surface
 pygame.init()
 pygame.display.set_caption("RaceTrack")
 
@@ -30,7 +28,7 @@ white, black, red, green, blue, yellow, magenta, cyan, gray, light_gray, dark_gr
 
 
 main_Menue = True
-
+gameIsRunning = True
 
 
 # ---Funktions
@@ -126,15 +124,20 @@ def Main_Menue():
     global main_Menue
     background = pygame.image.load("sprites/menue/starting_screen.png")
     
-
     while main_Menue:
         for event in pygame.event.get():
             if event == pygame.KEYDOWN and (event == pygame.K_ESCAPE):
-                pygame.QUIT()
+                pygame.quit()
+                sys.exit()
             elif event == pygame.KEYDOWN:
-                main_Menue
                 main_Menue = False
-        MainMenue_surface.blit(background, (0,0))
+
+
+        Menue_surf.blit(background, (0,0))
+        screen.blit(Menue_surf, (0,0))
+        pygame.display.update()
+        clock.tick(120)
+    pygame.quit()
 
 
 
@@ -154,7 +157,7 @@ class FakeRacer:
         self.draw()
 
     def draw(self):
-        MainMenue_surface.blit(pygame.transform.rotate(self.gfx, -90), (self.x, self.y))
+        Menue_surf.blit(pygame.transform.rotate(self.gfx, -90), (self.x, self.y))
 
 
 
@@ -219,10 +222,11 @@ class Racer:
             self.x = min(max(self.x, track_center_x), screen_width // 2 + track.get_width() // 2 - self.gfx.get_width())
 
 
-while GameIsRunning:
+while gameIsRunning:
     for event in pygame.event.get():
         if event == pygame.QUIT:
-            pygame.QUIT()
+            pygame.quit()
             sys.exit()
     
     Main_Menue()
+    pygame.quit()
