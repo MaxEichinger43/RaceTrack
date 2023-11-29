@@ -4,6 +4,7 @@ import math
 import pygame
 pygame.init()
 
+#  ---General stuff
 
 # Preparing screen
 screen_width = 1680
@@ -16,12 +17,14 @@ Track_surface = pygame.Surface((screen_width, screen_height))
 Racer_surface = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 MainMenue_surface = pygame.Surface((screen_width, screen_height))
 
-
+# Global variables
 debug_mode = True
-font = pygame.font.Font(None, 24)
-delta_time = 120//1000
-clock = pygame.time.Clock()
 
+font = pygame.font.Font(None, 24)
+
+delta_time = 120//1000
+
+clock = pygame.time.Clock()
 
 black = (0, 0, 0)
 
