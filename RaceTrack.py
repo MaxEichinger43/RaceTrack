@@ -3,7 +3,7 @@ import pygame
 import math
 import random
 pygame.init()
-pygame.display.set_caption("RaceTrack")
+pygame.display.set_caption("RaceTrackkkkkkkkkkk")
 
 # -------General
 screen_width = 1680
@@ -27,7 +27,7 @@ white, black, red, green, blue, yellow, magenta, cyan, gray, light_gray, dark_gr
     (64, 64, 64), (255, 165, 0), (128, 0, 128), (255, 182, 193), (165, 42, 42), (128, 128, 0))
 
 
-main_Menue = True
+starting_screen = True
 gameIsRunning = True
 
 
@@ -48,7 +48,7 @@ def imoprt_track():
     checkPoints = []
     checkPoints.append(pygame.Rect(600 + track_center_x, 740 + track_center_y, 2, 370))
 
-
+global track, road, offroad, startingLine, startingBox, checkPoints, track_center_x, track_center_y
 
 # Inputs
 
@@ -90,10 +90,10 @@ def racer2_handle_input(racer2, keys):
 
 # Debugging
 
-def debug(screen, debug_mode, font, racer1, racer2, keys):
+def debug(screen, debug, font, racer1, racer2, keys):
     if keys[pygame.K_F1]:
-        debug_mode = not debug_mode
-    if debug_mode:
+        debug = not debug
+    if debug:
         debug_text = f"Racer1 Speed: {racer1.speed:.0f}"
         debug_surface = font.render(debug_text, True, (255, 0, 0))
         screen.blit(debug_surface, (10, 10))
@@ -120,25 +120,48 @@ def debug(screen, debug_mode, font, racer1, racer2, keys):
 
 # Main menue
 
-def Main_Menue():
-    global main_Menue
+def starting_screen():
+    global menue, starting_screen, raceIsRunning
     background = pygame.image.load("sprites/menue/starting_screen.png")
     
-    while main_Menue:
+    while starting_screen:
         for event in pygame.event.get():
-            if event == pygame.KEYDOWN and (event == pygame.K_ESCAPE):
+            if event.type == pygame.KEYDOWN and (event.type == pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-            elif event == pygame.KEYDOWN:
-                main_Menue = False
+            elif event.type == pygame.KEYDOWN:
+                menue, starting_screen = True, False
+                main_menue()
 
 
         Menue_surf.blit(background, (0,0))
         screen.blit(Menue_surf, (0,0))
-        pygame.display.update()
+        pygame.display.flip()
         clock.tick(120)
-    pygame.quit()
 
+def main_menue():
+    global menue, starting_screen, raceIsRunning
+    background = pygame.image.load("sprites/menue/pselect.png")
+
+    while menue:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and (event.type == pygame.K_ESCAPE):
+                menue, starting_screen = False, True
+                starting_screen()
+            elif event.type == pygame.KEYDOWN:
+                menue, raceIsRunning = False, True
+
+
+        Menue_surf.blit(background, (0,0))
+        screen.blit(Menue_surf, (0,0))
+        pygame.display.flip()
+        clock.tick(120)
+
+
+def race():
+    global raceIsRunning, delta_time, menue, racer1, racer2
+    imoprt_track()
+    
 
 
 
@@ -222,11 +245,4 @@ class Racer:
             self.x = min(max(self.x, track_center_x), screen_width // 2 + track.get_width() // 2 - self.gfx.get_width())
 
 
-while gameIsRunning:
-    for event in pygame.event.get():
-        if event == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-    
-    Main_Menue()
-    pygame.quit()
+starting_screen()
