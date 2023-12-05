@@ -270,7 +270,7 @@ def menue_track_select():
 
 def race():
     global delta_time, racer1, racer2
-    race_is_running = True
+    #race_is_running = True
     imoprt_track()
     
 
