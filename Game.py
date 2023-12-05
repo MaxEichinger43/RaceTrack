@@ -1,6 +1,7 @@
 import random
 import sys
 import math
+from turtle import xcor
 import pygame
 pygame.init()
 
@@ -82,7 +83,7 @@ class Racer:
         self.drift = False
         self.acceleration = 3
         self.acc = False
-        self.brake = 10
+        self.brake = 4
         self.lap = 1
         self.check1 = False
 
@@ -130,8 +131,8 @@ class Racer:
 
 
 # Create racer instances
-racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer03(dermark)us.png", 90)
-racer2 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer02.png", 90)
+racer1 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer03.png", 90)
+racer2 = Racer(startingLine[0], startingLine[1], "sprites/racers/racer04.png", 90)
 
 
 
@@ -199,6 +200,8 @@ def debug(screen, debug_mode, font, racer1, racer2, keys):
         
 
 
+
+
 # Gameloop
 
 MainMenue = True
@@ -212,8 +215,8 @@ while GameIsRunning:
 
         StartinScreen = pygame.image.load("sprites/menue/starting_screen.png")
 
-        fakeRacer1 = FakeRacer(-50, 630, pygame.image.load("sprites/racers/racer01.png"))
-        fakeRacer2 = FakeRacer(-50, 700, pygame.image.load("sprites/racers/racer02.png"))
+        fakeRacer1 = FakeRacer(-50, 630, pygame.image.load("sprites/racers/racer11.png"))
+        fakeRacer2 = FakeRacer(-50, 700, pygame.image.load("sprites/racers/racer13.png"))
 
 
 
