@@ -1,9 +1,8 @@
 import sys
 import pygame
-import math
 import random
 pygame.init()
-pygame.display.set_caption("RaceTrackkkkkkkkkkk")
+pygame.display.set_caption("RaceTraaaaaaaack")
 
 # -------General
 screen_width = 1680
@@ -20,6 +19,16 @@ debug = True
 font = pygame.font.Font(None, 24)
 clock = pygame.time.Clock()
 
+fields = []
+racersToChoose = [pygame.image.load("sprites/racers/racer01.png"),pygame.image.load("sprites/racers/racer02.png"),pygame.image.load("sprites/racers/racer03.png"),
+                  pygame.image.load("sprites/racers/racer04.png"),pygame.image.load("sprites/racers/racer05.png"),pygame.image.load("sprites/racers/racer06.png"),
+                  pygame.image.load("sprites/racers/racer07.png"),pygame.image.load("sprites/racers/racer08.png"),pygame.image.load("sprites/racers/racer09.png"),
+                  pygame.image.load("sprites/racers/racer10.png"),pygame.image.load("sprites/racers/racer11.png"),pygame.image.load("sprites/racers/racer13.png")]
+
+tracksToChoose = [pygame.image.load("sprites/tracks/track01.png"),pygame.image.load("sprites/tracks/track02.png")]
+
+#fakeStreet = pygame.Rect(0, 574, 1678, 214)
+
 # Colors
 white, black, red, green, blue, yellow, magenta, cyan, gray, light_gray, dark_gray, orange, purple, pink, brown, olive = (
     (255, 255, 255), (0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255),
@@ -35,7 +44,7 @@ gameIsRunning = True
 
 def imoprt_track():
     global track, road, offroad, startingLine, startingBox, checkPoints, track_center_x, track_center_y
-    track = pygame.image.load("sprites/tracks/track02.png")
+    track = pygame.transform.scale(pygame.image.load("sprites/tracks/track02.png"), screenSize)
     road = (120, 120, 120, 255)
     offroad = (0, 120, 0, 255)
 
@@ -118,48 +127,150 @@ def debug(screen, debug, font, racer1, racer2, keys):
 
 
 
-# Main menue
+def spawn_fake_racers():
+    global fakeRacer1,fakeRacer2
+    fakeRacer1 = FakeRacer(-50, 630, pygame.transform.scale(pygame.image.load("sprites/racers/racer11.png"), (15,30)))
+    fakeRacer2 = FakeRacer(-50, 700, pygame.transform.scale(pygame.image.load("sprites/racers/racer13.png"), (15,30)))
 
-def starting_screen():
-    global menue, starting_screen, raceIsRunning
-    background = pygame.image.load("sprites/menue/starting_screen.png")
+def move_fake_racers():
+    fakeRacer1.move(random.randrange(50,200,10))
+    fakeRacer2.move(random.randrange(50,200,10))
+
+def draw_fields(fields):
+    for e in fields:
+        pygame.draw.rect(Menue_surf, gray, e.rect, 100)
+        Menue_surf.blit(e.gfx, (e.x - e.gfx.get_width(), e.y - e.gfx.get_height()))
+
+
+# Add racers as fields to a 4 by 3 matrix
+        
+def add_racer_fields():
+    global fields, racersToChoose
+    fields.clear()
+    column_count = 4
+    row_count = 3
+
+    zone_x = screen_width // (column_count + 1)
+    zone_y = screen_height // (row_count + 1)
+    zone_width = screen_width - screen_width // (column_count + 1)
+    zone_height = screen_height - screen_height // (row_count + 1)
+
+    column_width = zone_width // column_count
+    row_height = zone_height // row_count
+
+    for row in range(row_count):
+        for column in range(column_count):
+            index = row * column_count + column
+            if index < len(racersToChoose):
+                racer_gfx = racersToChoose[index]
+                racerToChoose = Field(zone_x + column * column_width - racer_gfx.get_width() // 2, zone_y + row * row_height - racer_gfx.get_height() // 2, pygame.transform.scale(racer_gfx, (20,40)))
+                fields.append(racerToChoose)
+
+
+
+# Add tracks as fields to a 4 by 3 matrix
+                
+def add_track_fields():
+    global fields, tracksToChoose
+    fields.clear()
+    column_count = 4
+    row_count = 3
+
+    zone_x = screen_width // (column_count + 1)
+    zone_y = screen_height // (row_count + 1)
+    zone_width = screen_width - screen_width // (column_count + 1)
+    zone_height = screen_height - screen_height // (row_count + 1)
+
+    column_width = zone_width // column_count
+    row_height = zone_height // row_count
+
+    for row in range(row_count):
+        for column in range(column_count):
+            index = row * column_count + column
+            if index < len(tracksToChoose):
+                track_gfx = tracksToChoose[index]
+                trackToChoose = Field(zone_x + column * column_width - track_gfx.get_width() // 2, zone_y + row * row_height - track_gfx.get_height() // 2, pygame.transform.scale(track_gfx, (20,40)))
+                fields.append(trackToChoose)
+
+
+# Gameloops
+    
+def starting_screen(): 
+    starting_screen = True
+    background = pygame.transform.scale(pygame.image.load("sprites/menue/starting_screen.png"), screenSize)
+    spawn_fake_racers()
     
     while starting_screen:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and (event.type == pygame.K_ESCAPE):
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                menue, starting_screen = True, False
-                main_menue()
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                else:
+                    starting_screen = False
+                    menue_player_select()
 
         Menue_surf.blit(background, (0,0))
+
+        move_fake_racers()
+
         screen.blit(Menue_surf, (0,0))
         pygame.display.flip()
         clock.tick(120)
 
-def main_menue():
-    global menue, starting_screen, raceIsRunning
+
+
+def menue_player_select():
+    menue_p = True
     background = pygame.image.load("sprites/menue/pselect.png")
+    add_racer_fields()
 
-    while menue:
+    while menue_p:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and (event.type == pygame.K_ESCAPE):
-                menue, starting_screen = False, True
-                starting_screen()
-            elif event.type == pygame.KEYDOWN:
-                menue, raceIsRunning = False, True
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    menue_p = False
+                    starting_screen()
+                else:
+                    menue_p = False
+                    menue_track_select()
 
         Menue_surf.blit(background, (0,0))
+        draw_fields(fields)
+
         screen.blit(Menue_surf, (0,0))
         pygame.display.flip()
         clock.tick(120)
+
+
+
+def menue_track_select():
+    menue_t = True
+    background = pygame.image.load("sprites/menue/tselect.png")
+    add_track_fields()
+
+    while menue_t:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    menue_t = False
+                    menue_player_select()
+                else:
+                    menue_t = False
+                    race()
+
+        Menue_surf.blit(background, (0,0))
+        draw_fields(fields)
+
+        screen.blit(Menue_surf, (0,0))
+        pygame.display.flip()
+        clock.tick(120)
+
 
 
 def race():
-    global raceIsRunning, delta_time, menue, racer1, racer2
+    global delta_time, racer1, racer2
+    race_is_running = True
     imoprt_track()
     
 
@@ -244,5 +355,12 @@ class Racer:
             self.y = min(max(self.y, track_center_y), screen_height // 2 + track.get_height() // 2 - self.gfx.get_height())
             self.x = min(max(self.x, track_center_x), screen_width // 2 + track.get_width() // 2 - self.gfx.get_width())
 
+
+class Field:
+    def __init__(self, x, y, gfx):
+        self.x = x
+        self.y = y
+        self.gfx = gfx
+        self.rect = pygame.Rect(self.x - self.gfx.get_width() // 2 - 35, self.y - self.gfx.get_height() // 2 - 35, 70, 70)
 
 starting_screen()

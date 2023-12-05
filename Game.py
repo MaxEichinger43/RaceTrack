@@ -215,7 +215,7 @@ while GameIsRunning:
 
         StartinScreen = pygame.image.load("sprites/menue/starting_screen.png")
 
-        fakeRacer1 = FakeRacer(-50, 630, pygame.image.load("sprites/racers/racer11.png"))
+        fakeRacer1 = FakeRacer(-50, 630, pygame.transform.scale(pygame.image.load("sprites/racers/racer11.png"), (20,40)))
         fakeRacer2 = FakeRacer(-50, 700, pygame.image.load("sprites/racers/racer13.png"))
 
 
