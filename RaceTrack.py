@@ -25,7 +25,7 @@ racersToChoose = [pygame.image.load("sprites/racers/racer01.png"),pygame.image.l
                   pygame.image.load("sprites/racers/racer07.png"),pygame.image.load("sprites/racers/racer08.png"),pygame.image.load("sprites/racers/racer09.png"),
                   pygame.image.load("sprites/racers/racer10.png"),pygame.image.load("sprites/racers/racer11.png"),pygame.image.load("sprites/racers/racer13.png")]
 
-tracksToChoose = [pygame.image.load("sprites/tracks/track01.png"),pygame.image.load("sprites/tracks/track02.png")]
+tracksToChoose = [pygame.transform.scale(pygame.image.load("sprites/tracks/track01.png"), (40,40)), pygame.transform.scale(pygame.image.load("sprites/tracks/track02.png"), (40,40))]
 
 #fakeStreet = pygame.Rect(0, 574, 1678, 214)
 
@@ -189,7 +189,7 @@ def add_track_fields():
             index = row * column_count + column
             if index < len(tracksToChoose):
                 track_gfx = tracksToChoose[index]
-                trackToChoose = Field(zone_x + column * column_width - track_gfx.get_width() // 2, zone_y + row * row_height - track_gfx.get_height() // 2, pygame.transform.scale(track_gfx, (20,40)))
+                trackToChoose = Field(zone_x + column * column_width - track_gfx.get_width() // 2, zone_y + row * row_height - track_gfx.get_height() // 2, track_gfx)
                 fields.append(trackToChoose)
 
 
