@@ -63,12 +63,12 @@ class Racer:
     def __init__(self, x, y, gfx, direction):
         self.x = x
         self.y = y
-        self.gfx = pygame.image.load(gfx)
+        self.gfx = gfx
         self.direction = direction
 
 #        self.mass = self.gfx.get_width() * self.gfx.get_height()
         self.size = (self.gfx.get_width() + self.gfx.get_height()) / 4
-        self.body = pygame.Rect(self.x - self.size, self.y - self.size, self.size, self.size)
+        #self.body = pygame.Rect(self.x - self.size, self.y - self.size, self.size, self.size)
 
         self.speed_Vec = pygame.math.Vector2()
         self.speed = self.speed_Vec.length
@@ -290,6 +290,42 @@ def add_track_fields():
 
 
 
+def handle_selection():
+    global menue_p, p1_chose, p2_chose, racer1, racer2
+    selected_field_p1 = 0
+    selected_field_p2 = 0
+
+    keys = pygame.key.get_pressed()
+
+# Player 1
+    
+    if keys[pygame.K_w]:
+        p1_chose = True
+    if keys[pygame.K_a] and not p1_chose:
+        selected_field_p1 -= 1
+    if keys[pygame.K_s]:
+        p1_chose = False
+    if keys[pygame.K_d] and not p1_chose:
+        selected_field_p1 += 1
+
+# Player 2
+        
+    if keys[pygame.K_UP]:
+        p2_chose = True
+    if keys[pygame.K_LEFT] and not p2_chose:
+        selected_field_p2 -= 1
+    if keys[pygame.K_DOWN]:
+        p2_chose = False
+    if keys[pygame.K_RIGHT] and not p2_chose:
+        selected_field_p2 += 1
+
+    if p1_chose and p2_chose:
+        racer1 = Racer(None, None, racersToChoose[selected_field_p1], 90)
+        racer2 = Racer(None, None, racersToChoose[selected_field_p2], 90)
+        menue_p = False
+        menue_track_select()
+
+
 # Gameloops
                 
 # Starting screen
@@ -322,9 +358,12 @@ def starting_screen():
 # Player selection
 
 def menue_player_select():
+    global p1_chose, p2_chose
     menue_p = True
     background = pygame.image.load("sprites/menue/pselect.png")
     add_racer_fields()
+    p1_chose = False
+    p2_chose = False
 
     while menue_p:
         for event in pygame.event.get():
@@ -332,10 +371,8 @@ def menue_player_select():
                 if event.key == pygame.K_ESCAPE:
                     menue_p = False
                     starting_screen()
-                else:
-                    menue_p = False
-                    menue_track_select()
 
+        handle_selection()
         Menue_surf.blit(background, (0,0))
         draw_fields(fields)
 
@@ -348,6 +385,7 @@ def menue_player_select():
 # Track selektion
 
 def menue_track_select():
+    global p1_chose, p2_chose
     menue_t = True
     background = pygame.image.load("sprites/menue/tselect.png")
     add_track_fields()
