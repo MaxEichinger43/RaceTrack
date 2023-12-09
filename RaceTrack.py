@@ -126,6 +126,8 @@ class Field:
         self.y = y
         self.gfx = gfx
         self.rect = pygame.Rect(self.x - self.gfx.get_width() // 2 - 35, self.y - self.gfx.get_height() // 2 - 35, 70, 70)
+        self.rect1 = pygame.Rect(self.x - self.gfx.get_width() // 2 - 40, self.y - self.gfx.get_height() // 2 - 40, 80, 80)
+        self.rect2 = pygame.Rect(self.x - self.gfx.get_width() // 2 - 45, self.y - self.gfx.get_height() // 2 - 45, 90, 90)
 
 
 
@@ -290,15 +292,12 @@ def add_track_fields():
 
 
 
-def handle_selection():
-    global menue_p, p1_chose, p2_chose, racer1, racer2
-    selected_field_p1 = 0
-    selected_field_p2 = 0
+def handle_selection(menue_p, menue_t):
+    global p1_chose, p2_chose, racer1, racer2, track, fields, selected_field_p1, selected_field_p2
 
     keys = pygame.key.get_pressed()
 
 # Player 1
-    
     if keys[pygame.K_w]:
         p1_chose = True
     if keys[pygame.K_a] and not p1_chose:
@@ -309,7 +308,6 @@ def handle_selection():
         selected_field_p1 += 1
 
 # Player 2
-        
     if keys[pygame.K_UP]:
         p2_chose = True
     if keys[pygame.K_LEFT] and not p2_chose:
@@ -319,11 +317,31 @@ def handle_selection():
     if keys[pygame.K_RIGHT] and not p2_chose:
         selected_field_p2 += 1
 
-    if p1_chose and p2_chose:
-        racer1 = Racer(None, None, racersToChoose[selected_field_p1], 90)
-        racer2 = Racer(None, None, racersToChoose[selected_field_p2], 90)
-        menue_p = False
-        menue_track_select()
+    selected_field_p1 %= len(fields)
+    selected_field_p2 %= len(fields)
+
+# Drawing and stuff depending on which menue is open
+    if menue_p:
+        if p1_chose and p2_chose:
+            racer1 = Racer(None, None, racersToChoose[selected_field_p1], 90)
+            racer2 = Racer(None, None, racersToChoose[selected_field_p2], 90)
+            menue_p = False
+            menue_track_select()
+
+    if menue_t:
+        if p1_chose and p2_chose:
+            if  selected_field_p1 == selected_field_p2:
+                track = tracksToChoose[selected_field_p1]
+            else:
+                x = random.random(0,1)
+                if x == 0:
+                    track = tracksToChoose[selected_field_p1]
+                else:
+                    track = tracksToChoose[selected_field_p2]
+
+
+    pygame.draw.rect(Menue_surf, red, fields[selected_field_p1].rect1, 5)
+    pygame.draw.rect(Menue_surf, blue, fields[selected_field_p2].rect2, 5)
 
 
 # Gameloops
@@ -358,12 +376,15 @@ def starting_screen():
 # Player selection
 
 def menue_player_select():
-    global p1_chose, p2_chose
+    global p1_chose, p2_chose, menue_p, menue_t, selected_field_p1, selected_field_p2
     menue_p = True
+    menue_t = False
     background = pygame.image.load("sprites/menue/pselect.png")
     add_racer_fields()
     p1_chose = False
     p2_chose = False
+    selected_field_p1 = 0
+    selected_field_p2 = 0
 
     while menue_p:
         for event in pygame.event.get():
@@ -372,9 +393,10 @@ def menue_player_select():
                     menue_p = False
                     starting_screen()
 
-        handle_selection()
         Menue_surf.blit(background, (0,0))
         draw_fields(fields)
+        
+        handle_selection(menue_p, menue_t)
 
         screen.blit(Menue_surf, (0,0))
         pygame.display.flip()
@@ -385,10 +407,13 @@ def menue_player_select():
 # Track selektion
 
 def menue_track_select():
-    global p1_chose, p2_chose
+    global p1_chose, p2_chose, menue_p, menue_t
     menue_t = True
+    menue_p = False
     background = pygame.image.load("sprites/menue/tselect.png")
     add_track_fields()
+    p1_chose = False
+    p2_chose = False
 
     while menue_t:
         for event in pygame.event.get():
@@ -396,12 +421,11 @@ def menue_track_select():
                 if event.key == pygame.K_ESCAPE:
                     menue_t = False
                     menue_player_select()
-                else:
-                    menue_t = False
-                    race()
-
+    
         Menue_surf.blit(background, (0,0))
         draw_fields(fields)
+        
+        handle_selection(menue_p, menue_t)
 
         screen.blit(Menue_surf, (0,0))
         pygame.display.flip()
