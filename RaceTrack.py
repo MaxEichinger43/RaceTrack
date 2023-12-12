@@ -7,7 +7,7 @@ pygame.display.set_caption("RaceTrack")
 screen_width = 1680
 screen_height = 1050
 screenSize = screen_width, screen_height
-screen = pygame.display.set_mode((screenSize))
+screen = pygame.display.set_mode((screenSize),0,0,0,1)
 
 Track_surf = pygame.Surface((screenSize))
 Racer_surf = pygame.Surface((screenSize), pygame.SRCALPHA)
@@ -148,25 +148,6 @@ def import_track(chosen_track):
     start_pixels = []
     fin_pixels = []
     
-    startmask = pygame.mask.from_threshold(track, white)
-
-    #pixels_on_screen = screen_width * screen_height
-    tester = (0, 0)
-
-    for y in range(track.get_height()):
-        for x in range(track.get_width()):
-            print("Tester:", x ,", ", y)
-
-            tester = (x + screen_width // 2 - track.get_width() // 2, y + screen_height // 2 - track.get_height() // 2)
-            if Menue_surf.get_at(tester) == start:
-                start_pixels.append(tester)
-
-    for y in range(track.get_height()):
-        for x in range(track.get_height()):
-            tester = (x + screen_width // 2 - track.get_width() // 2, y + screen_height // 2 - track.get_height() // 2)
-            if Menue_surf.get_at(tester) == fin:
-                fin_pixels.append(tester)
-
         
 
 
